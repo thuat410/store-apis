@@ -7,13 +7,18 @@
 	"name": "store-apis",
 	"main": "src/index.ts",
 	"compatibility_date": "2026-01-01",
-	"assets": {
-		"binding": "ASSETS",
-		"directory": "./public"
-	},
+	"compatibility_flags": [ "nodejs_compat" ],
 	"observability": {
 		"enabled": true
-	}
+	},
+	"d1_databases": [
+		{
+			"binding": "D1_DATABASE",
+			"database_name": "store-db",
+			"database_id": "e2cf8c0d-0271-4b7a-ba22-19fe1c6dcb6b",
+			"migrations_dir": "drizzle/migrations"
+		}
+	]
 	/**
 	 * Smart Placement
 	 * https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
