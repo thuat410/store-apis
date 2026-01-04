@@ -1,6 +1,8 @@
 import { createMiddleware } from "hono/factory";
 import { createAuth } from "../lib/auth";
 import { Bindings } from "../env";
+import { AppError } from '../lib/error';
+import { ERROR_CODES } from '../lib/constants';
 
 type AuthType = ReturnType<typeof createAuth>;
 type User = AuthType["$Infer"]["Session"]["user"];
@@ -20,19 +22,9 @@ export const authMiddleware = createMiddleware<{
     headers: c.req.raw.headers,
   });
   if (!sessionData)
-    return c.json({
-      code: "UNAUTHENTICATED",
-      success: false,
-      message: "Unauthenticated"
-    }, 401);
-
-  if (sessionData.user.banned) {
-    return c.json({
-      code: "FORBIDDEN",
-      success: false,
-      message: "Forbidden",
-    }, 403);
-  }
+    throw new AppError(ERROR_CODES.FORBIDDEN, "Forbidden", 401)
+  if (sessionData.user.banned)
+    throw new AppError(ERROR_CODES.FORBIDDEN, "User is banned", 401)
   c.set("user", sessionData.user);
   c.set("session", sessionData.session);
 

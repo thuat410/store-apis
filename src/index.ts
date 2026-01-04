@@ -4,6 +4,8 @@ import { createAuth } from './lib/auth';
 import { Bindings } from "./env";
 import adminRoutes from "./routes/admin.route";
 import { authMiddleware } from './middlewares/auth';
+import { AppError } from './lib/error';
+import { ERROR_CODES } from './lib/constants';
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -32,9 +34,16 @@ app.get("/api/me", authMiddleware, (c) => {
 app.route("/api/admin", adminRoutes);
 
 app.onError((err, c) => {
+  if (err instanceof AppError) {
+    return c.json({
+      code: err.code,
+      success: false,
+      message: err.message
+    }, err.status)
+  }
   console.error("❌ Server has error: ", err);
   return c.json({
-    code: "INTERNAL_SERVER_ERROR",
+    code: ERROR_CODES.INTERNAL,
     success: false,
     message: "There is error. Please try again later."
   }, 500);
